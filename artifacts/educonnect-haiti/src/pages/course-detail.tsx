@@ -127,12 +127,41 @@ export default function CourseDetail() {
           {/* Chapter Content */}
           <div className="w-full lg:w-2/3 xl:w-3/4 space-y-8">
             <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">
-              {/* Video Placeholder */}
-              <div className="aspect-video bg-slate-900 flex flex-col items-center justify-center text-slate-400 p-8 relative overflow-hidden group cursor-pointer">
-                <PlayCircle className="w-16 h-16 text-white/50 group-hover:text-white group-hover:scale-110 transition-all mb-4" />
-                <p className="font-medium text-white/80">Vidéo de la leçon : {activeChapter.title}</p>
-                {isDownloaded && <span className="absolute top-4 right-4 text-xs font-bold bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30">Stocké localement</span>}
+              {/* Video player */}
+              <div className="aspect-video bg-slate-900 relative">
+                {activeChapter.youtubeId ? (
+                  <iframe
+                    key={activeChapter.id}
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${activeChapter.youtubeId}?rel=0&modestbranding=1`}
+                    title={`Vidéo de la leçon : ${activeChapter.title}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 p-8">
+                    <PlayCircle className="w-16 h-16 text-white/50 mb-4" />
+                    <p className="font-medium text-white/80">Vidéo bientôt disponible</p>
+                  </div>
+                )}
+                {isDownloaded && (
+                  <span className="absolute top-4 right-4 text-xs font-bold bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 backdrop-blur-sm z-10">
+                    Stocké localement
+                  </span>
+                )}
               </div>
+              {activeChapter.youtubeSearch && (
+                <div className="px-6 md:px-8 pt-4 -mb-2">
+                  <a
+                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(activeChapter.youtubeSearch)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Voir d'autres vidéos sur ce sujet sur YouTube →
+                  </a>
+                </div>
+              )}
               
               {/* Written Summary */}
               <div className="p-6 md:p-8 space-y-6">

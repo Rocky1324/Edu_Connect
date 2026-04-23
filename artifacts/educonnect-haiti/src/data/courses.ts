@@ -10,7 +10,8 @@ export const courses = [
       {
         id: "c1",
         title: "Équations du premier degré",
-        videoUrl: "placeholder",
+        youtubeId: "wradXIoN-MU",
+        youtubeSearch: "équation premier degré collège explication simple",
         summary: "Une équation du premier degré est une égalité qui contient une variable à la puissance 1. Pour la résoudre, on isole la variable.",
         exercises: [
           { question: "Résoudre: 2x + 4 = 10", options: ["x = 2", "x = 3", "x = 4"], answer: 1 },
@@ -20,7 +21,8 @@ export const courses = [
       {
         id: "c2",
         title: "Théorème de Pythagore",
-        videoUrl: "placeholder",
+        youtubeId: "QP3CHQCSUD4",
+        youtubeSearch: "théorème de Pythagore explication simple",
         summary: "Dans un triangle rectangle, le carré de la longueur de l'hypoténuse est égal à la somme des carrés des longueurs des deux autres côtés.",
         exercises: [
           { question: "Si a=3 et b=4 dans un triangle rectangle, quelle est l'hypoténuse c?", options: ["5", "6", "7"], answer: 0 }
@@ -39,7 +41,8 @@ export const courses = [
       {
         id: "c1",
         title: "Le mouvement indigéniste",
-        videoUrl: "placeholder",
+        youtubeId: "RYqE1meCxv4",
+        youtubeSearch: "littérature haïtienne indigénisme Jacques Roumain",
         summary: "Mouvement littéraire et culturel haïtien qui prône un retour aux sources et la valorisation de la culture populaire.",
         exercises: [
           { question: "Lequel de ces auteurs est une figure de l'indigénisme ?", options: ["Jacques Roumain", "Victor Hugo", "Aimé Césaire"], answer: 0 }
@@ -58,7 +61,8 @@ export const courses = [
       {
         id: "c1",
         title: "La membrane plasmique",
-        videoUrl: "placeholder",
+        youtubeId: "RBXMkPMgh2Y",
+        youtubeSearch: "membrane plasmique cellule cours lycée",
         summary: "La membrane plasmique sépare l'intérieur de la cellule du milieu extérieur. Elle est composée d'une double couche de lipides.",
         exercises: [
           { question: "Quel est le rôle principal de la membrane ?", options: ["Produire de l'énergie", "Protéger la cellule et contrôler les échanges", "Stocker l'ADN"], answer: 1 }
