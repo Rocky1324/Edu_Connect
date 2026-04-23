@@ -34,17 +34,41 @@ export default function CourseDetail() {
 
   const activeChapter = course.chapters.find(c => c.id === activeChapterId) || course.chapters[0];
 
-  const handleDownload = () => {
-    if (!courseId) return;
+  const handleDownload = async () => {
+    if (!courseId || !course) return;
+    const base = import.meta.env.BASE_URL;
+    const mediaUrls = course.chapters
+      .map((c) => (c as { mp4Url?: string }).mp4Url)
+      .filter((u): u is string => !!u)
+      .map((u) => `${base}${u}`);
+
     if (isDownloaded) {
       const newDownloads = { ...downloadedCourses };
       delete newDownloads[courseId];
       setDownloadedCourses(newDownloads);
+      if (mediaUrls.length && navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: "REMOVE_MEDIA", urls: mediaUrls });
+      }
       toast.success("Cours retiré du mode hors-ligne");
-    } else {
-      setDownloadedCourses({ ...downloadedCourses, [courseId]: true });
-      toast.success("Cours téléchargé pour une lecture hors-ligne !");
+      return;
     }
+
+    if (mediaUrls.length) {
+      try {
+        const reg = await navigator.serviceWorker?.ready;
+        if (reg?.active) {
+          reg.active.postMessage({ type: "CACHE_MEDIA", urls: mediaUrls });
+        }
+      } catch (err) {
+        console.warn("SW caching failed", err);
+      }
+    }
+    setDownloadedCourses({ ...downloadedCourses, [courseId]: true });
+    toast.success(
+      mediaUrls.length
+        ? "Cours et vidéo téléchargés pour la lecture hors-ligne"
+        : "Cours téléchargé pour une lecture hors-ligne",
+    );
   };
 
   const handleAnswer = (exerciseIdx: number, optionIdx: number) => {
@@ -128,28 +152,47 @@ export default function CourseDetail() {
           <div className="w-full lg:w-2/3 xl:w-3/4 space-y-8">
             <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">
               {/* Video player */}
-              <div className="aspect-video bg-slate-900 relative">
-                {activeChapter.youtubeId ? (
-                  <iframe
-                    key={activeChapter.id}
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${activeChapter.youtubeId}?rel=0&modestbranding=1`}
-                    title={`Vidéo de la leçon : ${activeChapter.title}`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 p-8">
-                    <PlayCircle className="w-16 h-16 text-white/50 mb-4" />
-                    <p className="font-medium text-white/80">Vidéo bientôt disponible</p>
+              {(() => {
+                const localMp4 = (activeChapter as { mp4Url?: string }).mp4Url;
+                const useLocal = isDownloaded && !!localMp4;
+                return (
+                  <div className="aspect-video bg-slate-900 relative">
+                    {useLocal ? (
+                      <video
+                        key={`local-${activeChapter.id}`}
+                        className="w-full h-full"
+                        src={`${import.meta.env.BASE_URL}${localMp4}`}
+                        controls
+                        playsInline
+                      />
+                    ) : activeChapter.youtubeId ? (
+                      <iframe
+                        key={activeChapter.id}
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${activeChapter.youtubeId}?rel=0&modestbranding=1`}
+                        title={`Vidéo de la leçon : ${activeChapter.title}`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 p-8">
+                        <PlayCircle className="w-16 h-16 text-white/50 mb-4" />
+                        <p className="font-medium text-white/80">Vidéo bientôt disponible</p>
+                      </div>
+                    )}
+                    {useLocal && (
+                      <span className="absolute top-4 right-4 text-xs font-bold bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 backdrop-blur-sm z-10">
+                        Lecture hors-ligne
+                      </span>
+                    )}
+                    {isDownloaded && !localMp4 && (
+                      <span className="absolute top-4 right-4 text-xs font-bold bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30 backdrop-blur-sm z-10">
+                        Vidéo en ligne uniquement
+                      </span>
+                    )}
                   </div>
-                )}
-                {isDownloaded && (
-                  <span className="absolute top-4 right-4 text-xs font-bold bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 backdrop-blur-sm z-10">
-                    Stocké localement
-                  </span>
-                )}
-              </div>
+                );
+              })()}
               {activeChapter.youtubeSearch && (
                 <div className="px-6 md:px-8 pt-4 -mb-2">
                   <a

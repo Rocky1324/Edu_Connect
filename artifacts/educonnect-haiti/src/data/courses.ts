@@ -12,6 +12,7 @@ export const courses = [
         title: "Équations du premier degré",
         youtubeId: "wradXIoN-MU",
         youtubeSearch: "équation premier degré collège explication simple",
+        mp4Url: "lessons/equation-premier-degre.mp4",
         summary: "Une équation du premier degré est une égalité qui contient une variable à la puissance 1. Pour la résoudre, on isole la variable.",
         exercises: [
           { question: "Résoudre: 2x + 4 = 10", options: ["x = 2", "x = 3", "x = 4"], answer: 1 },
