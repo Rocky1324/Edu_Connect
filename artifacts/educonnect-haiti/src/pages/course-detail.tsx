@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { ArrowLeft, DownloadCloud, CheckCircle2, PlayCircle, BookText, PenTool, Check, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, DownloadCloud, CheckCircle2, PlayCircle, BookText, PenTool, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@/hooks/use-local-storage";
