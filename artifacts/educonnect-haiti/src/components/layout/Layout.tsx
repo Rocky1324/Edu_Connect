@@ -121,6 +121,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <li><Link href="/cours">Catalogue de cours</Link></li>
               <li><Link href="/opportunites">Bourses et concours</Link></li>
               <li><Link href="/centres">Centres relais</Link></li>
+              <li><Link href="/admin">Espace enseignant</Link></li>
             </ul>
           </div>
         </div>

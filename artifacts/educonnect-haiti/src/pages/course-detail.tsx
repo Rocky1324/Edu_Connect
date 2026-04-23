@@ -1,23 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import { ArrowLeft, ArrowRight, DownloadCloud, CheckCircle2, PlayCircle, BookText, PenTool, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { courses } from "@/data/courses";
+import { getLessonVideo } from "@/lib/lesson-storage";
 import { toast } from "sonner";
 
 export default function CourseDetail() {
   const [, params] = useRoute("/cours/:id");
   const courseId = params?.id;
   const course = courses.find(c => c.id === courseId);
-  
+
   const [downloadedCourses, setDownloadedCourses] = useLocalStorage<Record<string, boolean>>("downloaded-courses", {});
   const [activeChapterId, setActiveChapterId] = useState(course?.chapters[0]?.id);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
 
   const isDownloaded = downloadedCourses[courseId || ""] || false;
+  const activeChapterIdSafe = activeChapterId || course?.chapters[0]?.id;
+
+  useEffect(() => {
+    if (!activeChapterIdSafe) return;
+    let revoke: string | null = null;
+    setUploadedVideoUrl(null);
+    getLessonVideo(activeChapterIdSafe).then((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        revoke = url;
+        setUploadedVideoUrl(url);
+      }
+    }).catch(() => {});
+    return () => { if (revoke) URL.revokeObjectURL(revoke); };
+  }, [activeChapterIdSafe]);
 
   if (!course) {
     return (
@@ -154,14 +171,21 @@ export default function CourseDetail() {
               {/* Video player */}
               {(() => {
                 const localMp4 = (activeChapter as { mp4Url?: string }).mp4Url;
-                const useLocal = isDownloaded && !!localMp4;
+                const bundledOffline = isDownloaded && !!localMp4;
+                const useUploaded = !!uploadedVideoUrl;
+                const useLocal = useUploaded || bundledOffline;
+                const videoSrc = useUploaded
+                  ? uploadedVideoUrl!
+                  : bundledOffline
+                  ? `${import.meta.env.BASE_URL}${localMp4}`
+                  : "";
                 return (
                   <div className="aspect-video bg-slate-900 relative">
                     {useLocal ? (
                       <video
-                        key={`local-${activeChapter.id}`}
+                        key={`local-${activeChapter.id}-${useUploaded ? "u" : "b"}`}
                         className="w-full h-full"
-                        src={`${import.meta.env.BASE_URL}${localMp4}`}
+                        src={videoSrc}
                         controls
                         playsInline
                       />

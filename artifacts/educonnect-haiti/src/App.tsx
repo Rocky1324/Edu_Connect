@@ -11,6 +11,7 @@ import Orientation from "@/pages/orientation";
 import Opportunities from "@/pages/opportunities";
 import Centers from "@/pages/centers";
 import About from "@/pages/about";
+import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/opportunites" component={Opportunities} />
       <Route path="/centres" component={Centers} />
       <Route path="/a-propos" component={About} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
